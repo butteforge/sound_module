@@ -1,3 +1,7 @@
+#
+# This file streams in audio from the microphone and saves it to some file
+#
+
 import sounddevice as sd
 import numpy as np
 
@@ -8,11 +12,11 @@ print(sd.query_devices())
 sd.default.device = 24
 
 sample_rate = 44100
-chunk_size = 1024
+chunk_size = 8192
 
 buffer = []
 
-def callback(indata, frames, time, status):
+def callback(indata: np.ndarray, frames, time, status):
     # indata is a NumPy array (frames × channels)
     audio_chunk = indata[:, 0].copy()  # mono
     buffer.append(audio_chunk)
@@ -24,15 +28,20 @@ def callback(indata, frames, time, status):
     print(f"Freq: {freq_to_note(get_dominant_freq(audio_chunk, sample_rate))}")
 
 
-def get_dominant_freq(chunk, rate):
-    fft = np.fft.fft(chunk)
-    freqs = np.fft.fftfreq(len(fft), 1 / rate)
+def get_dominant_freq(chunk: np.ndarray, rate: int):
+    window = np.hanning(len(chunk))
 
-    magnitude = np.abs(fft)
+    chunk = chunk * window
+    fft = np.fft.rfft(chunk)
+    freqs = np.fft.rfftfreq(len(chunk), 1 / rate)
+
+    return freqs[np.argmax(np.abs(fft))]
+
+    #magnitude = np.abs(fft)
 
     # Only positive frequencies
-    half = len(freqs) // 2
-    peak_index = np.argmax(magnitude[:half])
+    #half = len(freqs) // 2
+    #peak_index = np.argmax(magnitude[:half])
 
     return freqs[peak_index]
 
@@ -82,6 +91,6 @@ with stream:
         audio = np.clip(audio, -1.0, 1.0)
 
         #   convert to int16
-        audio_float32 = (audio * 32767).astype(np.float32)
+        audio_int16 = (audio * 32767).astype(np.int16)
 
-        wavfile.write("mic_recording3.wav", sample_rate, audio_float32)
+        wavfile.write("mic_recording3.wav", sample_rate, audio_int16)

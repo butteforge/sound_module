@@ -1,3 +1,8 @@
+#
+# This file outputs a singular sin wave frequency when holding down keyboard chars
+#
+
+
 import numpy as np
 import sounddevice as sd
 from pynput import keyboard

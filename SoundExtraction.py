@@ -1,9 +1,16 @@
+#
+# This file extracts sound data from a file and creates some specific graphs
+#   first and second graph are channel graphs that display amplitude of sound over time
+#   third graph is the amplitude over frequency using FFT to transform the time domain to freq domain
+#   fourth graph is a spectogram showing frequency levels over time
+#
+
 import numpy
 
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
 
-rate, data = wavfile.read("mic_recording3.wav")
+rate, data = wavfile.read("win7.wav")
 
 print(f"sampling rate: {rate}")
 

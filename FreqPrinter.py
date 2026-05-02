@@ -1,3 +1,7 @@
+#
+# This file extracts sound data from a file and reads the most prominant frequency at a certai interval
+#
+
 import numpy as np
 import sounddevice as sd
 from scipy.io import wavfile
